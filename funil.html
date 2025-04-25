@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Funil de Vendas Dinâmico</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      padding: 20px;
+    }
+    .funil-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    .etapa {
+      width: 100%;
+      padding: 10px;
+      color: #fff;
+      border-radius: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .etapa span {
+      font-weight: bold;
+    }
+    .input-area {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    input {
+      padding: 8px;
+      margin: 5px;
+      width: 100px;
+    }
+    button {
+      padding: 8px 16px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h2>Funil de Vendas Dinâmico</h2>
+
+  <div class="input-area">
+    <label>Atendimentos: <input type="number" id="atendimentos" value="10"></label><br>
+    <label>Conversão Agendamentos (%): <input type="number" id="conv_agendamento" value="50"></label><br>
+    <label>Conversão Visita (%): <input type="number" id="conv_visita" value="75"></label><br>
+    <label>Conversão Proposta (%): <input type="number" id="conv_proposta" value="100"></label><br>
+    <label>Conversão Docs (%): <input type="number" id="conv_docs" value="33.33"></label><br>
+    <label>Conversão Reunião Fechamento (%): <input type="number" id="conv_reuniao" value="100"></label><br>
+    <label>Conversão Vendas (%): <input type="number" id="conv_venda" value="50"></label><br>
+    <button onclick="calcularFunil()">Calcular</button>
+  </div>
+
+  <div class="funil-container" id="funil"></div>
+
+  <script>
+    function calcularFunil() {
+      const atendimentos = parseFloat(document.getElementById('atendimentos').value);
+      const convAgendamento = parseFloat(document.getElementById('conv_agendamento').value) / 100;
+      const convVisita = parseFloat(document.getElementById('conv_visita').value) / 100;
+      const convProposta = parseFloat(document.getElementById('conv_proposta').value) / 100;
+      const convDocs = parseFloat(document.getElementById('conv_docs').value) / 100;
+      const convReuniao = parseFloat(document.getElementById('conv_reuniao').value) / 100;
+      const convVenda = parseFloat(document.getElementById('conv_venda').value) / 100;
+
+      const etapas = [];
+      etapas.push({ etapa: 'Atendimento', valor: atendimentos });
+      etapas.push({ etapa: 'Agendamento Visita', valor: atendimentos * convAgendamento });
+      etapas.push({ etapa: 'Visita', valor: etapas[1].valor * convVisita });
+      etapas.push({ etapa: 'Proposta', valor: etapas[2].valor * convProposta });
+      etapas.push({ etapa: 'Pasta Docs', valor: etapas[3].valor * convDocs });
+      etapas.push({ etapa: 'Reunião Fechamento', valor: etapas[4].valor * convReuniao });
+      etapas.push({ etapa: 'Venda', valor: etapas[5].valor * convVenda });
+
+      const conversaoFinal = etapas[6].valor / atendimentos * 100;
+      etapas.push({ etapa: 'Conversão Final (%)', valor: conversaoFinal });
+
+      const container = document.getElementById('funil');
+      container.innerHTML = '';
+
+      const cores = ['#007bff', '#17a2b8', '#28a745', '#ffc107', '#fd7e14', '#dc3545', '#6f42c1', '#343a40'];
+
+      etapas.forEach((item, index) => {
+        const div = document.createElement('div');
+        div.className = 'etapa';
+        div.style.backgroundColor = cores[index % cores.length];
+        div.style.width = `${100 - index * 10}%`;
+        div.innerHTML = `<span>${item.etapa}</span> <span>${item.valor.toFixed(2)}${item.etapa.includes('%') ? '%' : ''}</span>`;
+        container.appendChild(div);
+      });
+    }
+
+    window.onload = calcularFunil;
+  </script>
+</body>
+</html>
